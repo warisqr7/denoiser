@@ -47,19 +47,20 @@ def run(args):
     # Demucs requires a specific number of samples to avoid 0 padding during training
     if hasattr(model, 'valid_length'):
         length = model.valid_length(length)
-    kwargs = {"matching": args.dset.matching, "sample_rate": args.sample_rate}
+    print(args)
+    kwargs = {"matching": args.dset.dset.matching, "sample_rate": args.sample_rate}
     # Building datasets and loaders
     tr_dataset = NoisyCleanSet(
-        args.dset.train, length=length, stride=stride, pad=args.pad, **kwargs)
+        args.dset.dset.train, length=length, stride=stride, pad=args.pad, **kwargs)
     tr_loader = distrib.loader(
         tr_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-    if args.dset.valid:
-        cv_dataset = NoisyCleanSet(args.dset.valid, **kwargs)
+    if args.dset.dset.valid:
+        cv_dataset = NoisyCleanSet(args.dset.dset.valid, **kwargs)
         cv_loader = distrib.loader(cv_dataset, batch_size=1, num_workers=args.num_workers)
     else:
         cv_loader = None
-    if args.dset.test:
-        tt_dataset = NoisyCleanSet(args.dset.test, **kwargs)
+    if args.dset.dset.test:
+        tt_dataset = NoisyCleanSet(args.dset.dset.test, **kwargs)
         tt_loader = distrib.loader(tt_dataset, batch_size=1, num_workers=args.num_workers)
     else:
         tt_loader = None
@@ -83,9 +84,9 @@ def run(args):
 def _main(args):
     global __file__
     # Updating paths in config
-    for key, value in args.dset.items():
+    for key, value in args.dset.dset.items():
         if isinstance(value, str) and key not in ["matching"]:
-            args.dset[key] = hydra.utils.to_absolute_path(value)
+            args.dset.dset[key] = hydra.utils.to_absolute_path(value)
     __file__ = hydra.utils.to_absolute_path(__file__)
     if args.verbose:
         logger.setLevel(logging.DEBUG)
@@ -99,7 +100,7 @@ def _main(args):
         run(args)
 
 
-@hydra.main(config_path="conf/config.yaml")
+@hydra.main(config_path="conf", config_name="config", version_base="1.1")
 def main(args):
     try:
         _main(args)

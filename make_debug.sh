@@ -7,8 +7,7 @@
 # authors: adiyoss and adefossez
 
 path=egs/debug/tr
-if [[ ! -e $path ]]; then
-    mkdir -p $path
-fi
+mkdir -p $path
+
 python3 -m denoiser.audio dataset/debug/noisy > $path/noisy.json
 python3 -m denoiser.audio dataset/debug/clean > $path/clean.json
