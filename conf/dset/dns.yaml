@@ -1,8 +1,8 @@
 dset:
   train: egs/dns/tr
-  valid:
+  valid: 
   test: egs/dns/tt
   noisy_json:
   noisy_dir:
   matching: dns
-eval_every: 4
+eval_every: 500
